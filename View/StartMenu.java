@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class StartMenu extends JPanel implements GameOverListener {
+    // menu properties
     private Image background;
     private JPanel menuPanel;
     private JTable scoreTable;
@@ -21,6 +22,7 @@ public class StartMenu extends JPanel implements GameOverListener {
     private StartMenuViewModel startMenuViewModel;
 
     public StartMenu(JFrame frame, int frameWidth, int frameHeight) {
+        // init frame
         this.frame = frame;
         this.frameWidth = frameWidth;
         this.frameHeight = frameHeight;

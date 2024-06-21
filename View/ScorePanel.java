@@ -7,10 +7,12 @@ import javax.swing.*;
 import java.awt.*;
 
 public class ScorePanel extends JPanel {
+    // properties
     private JLabel scoreLabel, upLabel, downLabel;
     private PlayerScore playerScore;
 
     public ScorePanel(PlayerScore playerScore) {
+        // init value
         this.playerScore = playerScore;
 
         Font defaultFont = new Font("Comic Sans MS", Font.BOLD, 20);
@@ -28,23 +30,29 @@ public class ScorePanel extends JPanel {
         downLabel.setBounds(10, 80, 100, 20);
 
         // Create score panel and add labels to it
-        setLayout(null); // Using GridLayout for vertical arrangement
+        setLayout(null);
         setOpaque(false); // Make score panel transparent
         add(scoreLabel);
         add(upLabel);
         add(downLabel);
     }
 
-    public void updateScore(int point, boolean hangingBlock) {
-        playerScore.setScore(playerScore.getScore() + point);
-        scoreLabel.setText("Score: " + playerScore.getScore());
+    /**
+     * Setter and gatter
+     */
 
-        if(hangingBlock) {
-            playerScore.setUpCounter(playerScore.getUpCounter() + 1);
-            upLabel.setText("Up: " + playerScore.getUpCounter());
-        } else {
-            playerScore.setDownCounter(playerScore.getDownCounter() + 1);
-            downLabel.setText("Down: " + playerScore.getDownCounter());
+    public void updateScore(int point, boolean hangingBlock) {
+        if(point != 0) {
+            playerScore.setScore(playerScore.getScore() + point);
+            scoreLabel.setText("Score: " + playerScore.getScore());
+
+            if(hangingBlock) {
+                playerScore.setUpCounter(playerScore.getUpCounter() + 1);
+                upLabel.setText("Up: " + playerScore.getUpCounter());
+            } else {
+                playerScore.setDownCounter(playerScore.getDownCounter() + 1);
+                downLabel.setText("Down: " + playerScore.getDownCounter());
+            }
         }
     }
 

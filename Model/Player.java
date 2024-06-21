@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class Player extends PlayerScore {
+    // image properties
     private Image stayImage;
     private ArrayList<Image> runKeyFrameList, flippedRunKeyFrameList;
     private int width, height;
@@ -15,25 +16,29 @@ public class Player extends PlayerScore {
     private int velocity;
 
     public Player(String prefixDir, int posX, int posY, PlayerScore playerScore) {
+        // score
         super(playerScore.getUsername(), playerScore.getScore(), playerScore.getUpCounter(), playerScore.getDownCounter());
+
+        // image
         this.stayImage = new ImageIcon(prefixDir + "assets/player/stay.png").getImage();
 
+        // keyframe when running
         this.runKeyFrameList = new ArrayList<>();
         this.runKeyFrameList.add(new ImageIcon(prefixDir + "assets/player/run_keyframe_1.png").getImage());
         this.runKeyFrameList.add(new ImageIcon(prefixDir + "assets/player/run_keyframe_2.png").getImage());
-
         this.flippedRunKeyFrameList = new ArrayList<>();
         this.flippedRunKeyFrameList.add(flipImageHorizontally(this.runKeyFrameList.get(0)));
         this.flippedRunKeyFrameList.add(flipImageHorizontally(this.runKeyFrameList.get(1)));
 
+        // positioning
         this.posX = posX;
         this.posY = posY;
-
         this.width = 50;
         this.height = 100;
         this.velocity = 5;
     }
 
+    // flipp the image to make simplify design
     private Image flipImageHorizontally(Image img) {
         BufferedImage bufferedImage = toBufferedImage(img);
         AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
@@ -55,6 +60,9 @@ public class Player extends PlayerScore {
         return bufferedImage;
     }
 
+    /*
+     * setter and getter for all properties
+     * */
     public Image getStayImage() {
         return stayImage;
     }

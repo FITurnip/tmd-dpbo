@@ -7,12 +7,14 @@ public class Database {
     private Statement statement;
 
     public Database() {
+        // prepare environment value
         String host = "localhost";
         String port = "3306";
         String database = "updowndb";
         String user = "root";
         String password = "";
 
+        // make connection to mysql
         String url = "jdbc:mysql://" + host + ":" + port + "/" + database;
         try {
             connection = DriverManager.getConnection(url, user, password);
@@ -23,6 +25,7 @@ public class Database {
     }
 
     public ResultSet selectQuery(String sql) {
+        // execute select query
         try {
             statement.executeQuery(sql);
             return statement.getResultSet();
@@ -32,6 +35,7 @@ public class Database {
     }
 
     public int insertUpdateDeleteQuery(String sql) {
+        // execute insert, update, or delete query
         try {
             return statement.executeUpdate(sql);
         } catch (SQLException e) {
@@ -40,6 +44,7 @@ public class Database {
     }
 
     public Statement getStatement() {
+        // return statement
         return statement;
     }
 }

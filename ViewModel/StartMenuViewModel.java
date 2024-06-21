@@ -20,9 +20,5 @@ public class StartMenuViewModel {
 
     public void updateTScore() {
         tScore = new TScore();
-
-        for(PlayerScore playerScore: tScore.getPlayerList()) {
-            System.out.println(playerScore.getUsername());
-        }
     }
 }

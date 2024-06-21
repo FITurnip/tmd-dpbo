@@ -57,30 +57,28 @@ public class GameBase extends JPanel implements KeyListener {
         add(scorePanel);
 
         Thread movementThread = new Thread(() -> {
+            lowerBoundY = viewModel.getBlock(0).getPosY();
             while (true) {
                 if(inputAD != 0) {
                     movePlayerHorizontal();
                 }
 
-                if(verticalDirection == -1) {
-                    int playerPosY = viewModel.getPlayer().getPosY();
-                    if(playerPosY > upperBoundY) movePlayerVertical();
-                    else {
-                        doesJump = false;
-                        verticalDirection = 1;
-                    }
+                int lowerBoundPlayerPosY = viewModel.getPlayer().getPosY();
+                lowerBoundPlayerPosY += viewModel.getPlayer().getHeight();
+                if(lowerBoundPlayerPosY < lowerBoundY) {
+                    viewModel.getPlayer().setPosY(viewModel.getPlayer().getPosY() + 1);
+                } else if(lowerBoundPlayerPosY == lowerBoundY) {
+                    if(lowerBoundY != panelHeight) updateScore();
+                    else handleGameOver();
+                } else {
+                    handleGameOver();
                 }
 
-                if(verticalDirection == 1) {
-                    int playerPosY = viewModel.getPlayer().getPosY();
-                    playerPosY += viewModel.getPlayer().getHeight();
-                    if(playerPosY < lowerBoundY) {
-                        movePlayerVertical();
-                    } else {
-                        verticalDirection = 0;
-                        if(playerPosY > panelHeight - 150) handleGameOver();
-                        else updateScore();
-                    }
+                if(verticalDirection != 0) {
+                    int newPosY = viewModel.getPlayer().getPosY() + 3 * verticalDirection;
+
+                    if(newPosY + viewModel.getPlayer().getHeight() >= lowerBoundY) verticalDirection = 0;
+                    else viewModel.getPlayer().setPosY(newPosY);
                 }
 
                 try {
@@ -95,15 +93,16 @@ public class GameBase extends JPanel implements KeyListener {
     }
 
     private void handleGameOver() {
+        // Remove current GameBase panel from its parent container
+        Container parent = this.getParent();
+        while(parent == null) parent = this.getParent();
+
         // Show a game-over message
         JOptionPane.showMessageDialog(this, "Game Over!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
 
-        // Remove current GameBase panel from its parent container
-        Container parent = this.getParent();
         parent.remove(this);
         parent.revalidate();
 
-//        System.out.println(scorePanel.getPlayerScore().getScore() + " " + scorePanel.getPlayerScore().getUpCounter());
         try {
             scorePanel.getPlayerScore().saveToDatabase();
         } catch (SQLException e) {
@@ -148,6 +147,8 @@ public class GameBase extends JPanel implements KeyListener {
             Block block = blockList.get(itr);
             g.drawImage(block.getImage(), block.getPosX(), block.getPosY(), block.getWidth(), block.getHeight(), this);
 
+            add(block.getScoreLabel());
+
             if(block.getPosX() < panelWidth) {
                 if(itr < blockListSize) {
                     itr++;
@@ -184,23 +185,9 @@ public class GameBase extends JPanel implements KeyListener {
         switch (key) {
             case KeyEvent.VK_D -> inputAD = -1;
             case KeyEvent.VK_A -> inputAD = 1;
-            case KeyEvent.VK_W -> {
-                if(!doesJump) {
-                    upperBoundY = viewModel.getBlock(currentBlockIndex).getPosY() - viewModel.getPlayer().getHeight() - 100;
-                }
-
-                upperBoundY -= 20;
-                doesJump = true;
-                verticalDirection = -1;
-
-                if(upperBoundY < 0) upperBoundY = 0;
-                if (verticalDirection != 1) {
-                    lowerBoundY = viewModel.getBlock(currentBlockIndex).getPosY() - viewModel.getPlayer().getHeight();
-                }
-            }
-            case KeyEvent.VK_S -> {
-                verticalDirection = 1;
-            }
+            case KeyEvent.VK_W -> verticalDirection = -1;
+            case KeyEvent.VK_S -> verticalDirection = 1;
+            case KeyEvent.VK_SPACE -> handleGameOver();
         }
     }
 
@@ -210,7 +197,7 @@ public class GameBase extends JPanel implements KeyListener {
         switch (key) {
             case KeyEvent.VK_D -> inputAD = 0;
             case KeyEvent.VK_A -> inputAD = 0;
-            case KeyEvent.VK_W -> verticalDirection = -1;
+            case KeyEvent.VK_W -> verticalDirection = 0;
         }
     }
 
@@ -259,12 +246,5 @@ public class GameBase extends JPanel implements KeyListener {
             currentBlockIndex += shiftValue;
             lowerBoundY = blockList.get(currentBlockIndex).getPosY();
         }
-    }
-
-    public void movePlayerVertical() {
-        int velocity = viewModel.getPlayer().getVelocity();
-        if(verticalDirection == 1) velocity /= 2;
-        int finalVelocity = verticalDirection * velocity;
-        viewModel.getPlayer().setPosY(viewModel.getPlayer().getPosY() + finalVelocity);
     }
 }

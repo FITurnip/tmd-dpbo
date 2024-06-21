@@ -9,15 +9,23 @@ import java.util.List;
 import java.sql.SQLException;
 
 public class TScore extends Database {
+    // player score data list
     private List<PlayerScore> playerList;
 
     public TScore() {
+        // use db method
         super();
+
+        // save all data from db
         playerList = new ArrayList<>();
         setFromDatabase();
     }
 
+    /**
+     * setter and getter
+     */
     public void setFromDatabase() {
+        // set from db
         try {
             ResultSet resultSet = selectQuery("SELECT * FROM tscore");
             String username;
@@ -45,11 +53,10 @@ public class TScore extends Database {
     }
 
     public PlayerScore getPlayer(String username) {
+        // get player by username
         PlayerScore res = null;
         for (PlayerScore player : playerList) {
-            System.out.println(username + " " + player.getUsername());
             if (player.getUsername().equals(username)) {
-                System.out.println("FOUND");
                 res = player;
             }
         }

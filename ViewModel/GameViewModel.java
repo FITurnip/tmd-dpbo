@@ -54,7 +54,6 @@ public class GameViewModel {
 
         for (int i = 0; i < 5; i++) {
             makeBlock(velocity);
-            System.out.println("jalan");
         }
     }
 
