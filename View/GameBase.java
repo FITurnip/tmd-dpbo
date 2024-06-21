@@ -15,20 +15,24 @@ public class GameBase extends JPanel implements KeyListener {
     private final int panelHeight;
     private final Image backgroundImage;
 
-    private boolean isFall = false;
     private int currentBlockIndex = 0;
     private int inputAD = 0;
     private int verticalDirection = 0;
-    private int jumpPos = 0;
 
     private int keyFrameIndex = 0;
 
     private int verticalVelocity;
     private int upperBoundY, lowerBoundY;
 
+    private ScorePanel scorePanel; // Reference to ScorePanel
+
+    private int playerPosX;
+
+    private boolean doesJump = false;
     public GameBase(String currentDirectory, int panelWidth, int panelHeight) {
         this.panelWidth = panelWidth;
         this.panelHeight = panelHeight;
+
         this.backgroundImage = new ImageIcon(currentDirectory + "assets/background.jpg").getImage();
 
         this.viewModel = new GameViewModel(currentDirectory, panelWidth, panelHeight);
@@ -39,7 +43,14 @@ public class GameBase extends JPanel implements KeyListener {
         requestFocus(); // Request focus so that panel can receive key events
         addKeyListener(this);
 
-        verticalVelocity = viewModel.getPlayer().getVelocity();
+        playerPosX = viewModel.getPlayer().getPosX();
+        this.verticalVelocity = viewModel.getPlayer().getVelocity();
+
+        // Initialize scorePanel and add to GameBase panel
+        scorePanel = new ScorePanel(viewModel);
+        scorePanel.setBounds(panelWidth / 100, panelHeight / 2 - 100, panelWidth, panelHeight);
+        setLayout(null);
+        add(scorePanel);
 
         Thread movementThread = new Thread(() -> {
             while (true) {
@@ -47,27 +58,25 @@ public class GameBase extends JPanel implements KeyListener {
                     movePlayerHorizontal();
                 }
 
-                if(verticalDirection != 0) {
-                    if(verticalDirection == -1) {
-                        if(viewModel.getPlayer().getPosY() <= upperBoundY) {
-                            verticalDirection = 1;
-                        }
+                if(verticalDirection == -1) {
+                    int playerPosY = viewModel.getPlayer().getPosY();
+                    if(playerPosY > upperBoundY) movePlayerVertical();
+                    else {
+                        doesJump = false;
+                        verticalDirection = 1;
                     }
+                }
 
-                    if(verticalDirection == 1) {
-                        System.out.println("jalan 1");
-                        if(viewModel.getPlayer().getPosX() + viewModel.getPlayer().getWidth() >= viewModel.getBlock(currentBlockIndex + 1).getPosX()) {
-                            System.out.println("jalan 2");
-                            currentBlockIndex++;
-                            lowerBoundY = viewModel.getBlock(currentBlockIndex).getPosY() - viewModel.getPlayer().getHeight();
-                            verticalVelocity = 0;
-                        }
-
-                        if(viewModel.getPlayer().getPosY() >= lowerBoundY) {
-                            verticalDirection = 0;
-                        }
+                if(verticalDirection == 1) {
+                    int playerPosY = viewModel.getPlayer().getPosY();
+                    playerPosY += viewModel.getPlayer().getHeight();
+                    if(playerPosY < lowerBoundY) {
+                        movePlayerVertical();
+                    } else {
+                        verticalDirection = 0;
+                        if(playerPosY > panelHeight - 150) handleGameOver();
+                        else updateScore();
                     }
-                    movePlayerVertical();
                 }
 
                 try {
@@ -79,6 +88,17 @@ public class GameBase extends JPanel implements KeyListener {
             }
         });
         movementThread.start();
+    }
+
+    private void handleGameOver() {
+        // Show a game-over message
+        JOptionPane.showMessageDialog(this, "Game Over!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+        // Optionally, reset the game or exit
+    }
+    private void updateScore() {
+        Block block = viewModel.getBlock(currentBlockIndex);
+        scorePanel.updateScore(block.getScore());
+        block.setScore(0);
     }
 
     @Override
@@ -99,9 +119,21 @@ public class GameBase extends JPanel implements KeyListener {
 
     public void drawBlocks(Graphics g) {
         List<Block> blockList = viewModel.getBlockList();
-
-        for (Block block : blockList) {
+        int blockListSize = blockList.size();
+        int itr = 0;
+        boolean doesBlockDraw = true;
+        while(doesBlockDraw) {
+            Block block = blockList.get(itr);
             g.drawImage(block.getImage(), block.getPosX(), block.getPosY(), block.getWidth(), block.getHeight(), this);
+
+            if(block.getPosX() < panelWidth) {
+                if(itr < blockListSize) {
+                    itr++;
+                } else {
+                    doesBlockDraw = false;
+                }
+            }
+            else doesBlockDraw = false;
         }
     }
 
@@ -131,15 +163,21 @@ public class GameBase extends JPanel implements KeyListener {
             case KeyEvent.VK_D -> inputAD = -1;
             case KeyEvent.VK_A -> inputAD = 1;
             case KeyEvent.VK_W -> {
+                if(!doesJump) {
+                    upperBoundY = viewModel.getBlock(currentBlockIndex).getPosY() - viewModel.getPlayer().getHeight() - 100;
+                }
+
+                upperBoundY -= 20;
+                doesJump = true;
+                verticalDirection = -1;
+
+                if(upperBoundY < 0) upperBoundY = 0;
                 if (verticalDirection != 1) {
-                    verticalDirection = -1;
-                    upperBoundY = viewModel.getBlock(currentBlockIndex).getPosY() - 400;
-                    if(upperBoundY < 0) upperBoundY = 0;
                     lowerBoundY = viewModel.getBlock(currentBlockIndex).getPosY() - viewModel.getPlayer().getHeight();
                 }
             }
             case KeyEvent.VK_S -> {
-                if (verticalDirection != 1) verticalDirection = 1;
+                verticalDirection = 1;
             }
         }
     }
@@ -150,27 +188,20 @@ public class GameBase extends JPanel implements KeyListener {
         switch (key) {
             case KeyEvent.VK_D -> inputAD = 0;
             case KeyEvent.VK_A -> inputAD = 0;
+            case KeyEvent.VK_W -> verticalDirection = -1;
         }
     }
 
     public boolean isOnBlock(Block block) {
         int blockPosX = block.getPosX();
-        int playerPosX = viewModel.getPlayer().getPosX();
-        boolean isOnBlockCond = true;
-
-        if(inputAD == 1) {
-            playerPosX += viewModel.getPlayer().getWidth();
-            if(blockPosX > playerPosX) {
-                isOnBlockCond = false;
-            }
-        } else if(inputAD == -1) {
-            blockPosX += block.getWidth();
-            if(playerPosX > blockPosX) {
-                isOnBlockCond = false;
-            }
+        int intolerantWidthVal = 20;
+        boolean result = true;
+        if(playerPosX + viewModel.getPlayer().getWidth() - intolerantWidthVal < blockPosX) {
+            result = false;
+        } else if(playerPosX > blockPosX + block.getWidth() - intolerantWidthVal) {
+            result =false;
         }
-
-        return isOnBlockCond;
+        return result;
     }
 
     public void movePlayerHorizontal() {
@@ -182,10 +213,18 @@ public class GameBase extends JPanel implements KeyListener {
         for (int i = 0; i < blockListSize; i++) {
             Block block = blockList.get(i);
             if(i == currentBlockIndex) {
-                isFall = !isOnBlock(block);
-                if(isFall) {
+                if(!isOnBlock(block)) {
                     verticalDirection = 1;
-                    lowerBoundY = panelHeight - viewModel.getPlayer().getHeight();
+                    lowerBoundY = panelHeight;
+                    if(isOnBlock(blockList.get(currentBlockIndex + 1))) {
+                        currentBlockIndex++;
+                        lowerBoundY = blockList.get(currentBlockIndex).getPosY();
+                    } else if(currentBlockIndex != 0) {
+                        if(isOnBlock(blockList.get(currentBlockIndex - 1))) {
+                            currentBlockIndex--;
+                            lowerBoundY = blockList.get(currentBlockIndex).getPosY();
+                        }
+                    }
                 }
             }
             block.setPosX(block.getPosX() + velocity);

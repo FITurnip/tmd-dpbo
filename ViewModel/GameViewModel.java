@@ -62,7 +62,10 @@ public class GameViewModel {
         } else {
             lastPosX = blockList.get(blockList.size() - 1).getPosX() + lastPosX * 2;
             if(topBlockCond) {
-                newPosY = panelHeight / 2 - newPosY;
+                newPosY = panelHeight - newPosY;
+                blockHeight = 100;
+            } else {
+                blockHeight = 500;
             }
         }
 

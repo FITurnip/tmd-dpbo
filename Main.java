@@ -1,4 +1,4 @@
-import View.GameBase;
+import View.StartMenu;
 
 import javax.swing.*;
 import java.awt.*;
@@ -7,29 +7,23 @@ public class Main {
     public static int frameWidth, frameHeight;
 
     public static void main(String[] args) {
-        String currentDirectory = System.getProperty("user.dir") + "/src/";
-        // Print the current directory
-        System.out.println("Current directory: " + currentDirectory);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                JFrame frame = new JFrame("Fullscreen Game");
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+                frame.setUndecorated(true);
 
-        // Create a JFrame instance
-        JFrame frame = new JFrame("Fullscreen Game");
+                setFrameSize();
 
-        // Set the default close operation
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                // Create and add StartMenu to the frame
+                StartMenu startMenu = new StartMenu(frame, frameWidth, frameHeight);
+                frame.add(startMenu);
 
-        // Create an instance of the Game panel
-        setFrameSize();
-        GameBase gameBasePanel = new GameBase(currentDirectory, frameWidth, frameHeight);
-
-        // Add the Game panel to the frame
-        frame.add(gameBasePanel);
-
-        // Set the frame to fullscreen mode
-        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        frame.setUndecorated(true);
-
-        // Set the frame visible
-        frame.setVisible(true);
+                frame.setVisible(true);
+            }
+        });
     }
 
     public static void setFrameSize() {

@@ -9,6 +9,7 @@ public class Block {
     private int width, height;
     private int velocity;
     private boolean onTop;
+    private int score;
 
     public Block(String prefixDir, int width, int height, int posX, int posY, int velocity, boolean onTop) {
         image = new ImageIcon(prefixDir + "assets/block.png").getImage();
@@ -18,6 +19,7 @@ public class Block {
         this.posY = posY;
         this.velocity = velocity;
         this.onTop = onTop;
+        score = 2000 - posY;
     }
 
     public Image getImage() {
@@ -74,5 +76,13 @@ public class Block {
 
     public void setOnTop(boolean onTop) {
         this.onTop = onTop;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
     }
 }

@@ -13,16 +13,15 @@ public class Player {
     private int width, height;
     private int posX, posY;
     private int velocity;
-    private int score;
+    private int score, upCounter, downCounter;
 
     public Player(String prefixDir, int posX, int posY) {
         this.stayImage = new ImageIcon(prefixDir + "assets/player/stay.png").getImage();
-        this.runKeyFrameList = new ArrayList<>();
 
+        this.runKeyFrameList = new ArrayList<>();
         this.runKeyFrameList.add(new ImageIcon(prefixDir + "assets/player/run_keyframe_1.png").getImage());
         this.runKeyFrameList.add(new ImageIcon(prefixDir + "assets/player/run_keyframe_2.png").getImage());
 
-        // Flip runKeyFrame horizontally
         this.flippedRunKeyFrameList = new ArrayList<>();
         this.flippedRunKeyFrameList.add(flipImageHorizontally(this.runKeyFrameList.get(0)));
         this.flippedRunKeyFrameList.add(flipImageHorizontally(this.runKeyFrameList.get(1)));
@@ -33,7 +32,10 @@ public class Player {
         this.width = 50;
         this.height = 100;
         this.velocity = 5;
+
         this.score = 0;
+        this.upCounter = 0;
+        this.downCounter = 0;
     }
 
     private Image flipImageHorizontally(Image img) {
