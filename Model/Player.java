@@ -7,15 +7,15 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-public class Player {
+public class Player extends PlayerScore {
     private Image stayImage;
     private ArrayList<Image> runKeyFrameList, flippedRunKeyFrameList;
     private int width, height;
     private int posX, posY;
     private int velocity;
-    private int score, upCounter, downCounter;
 
-    public Player(String prefixDir, int posX, int posY) {
+    public Player(String prefixDir, int posX, int posY, PlayerScore playerScore) {
+        super(playerScore.getUsername(), playerScore.getScore(), playerScore.getUpCounter(), playerScore.getDownCounter());
         this.stayImage = new ImageIcon(prefixDir + "assets/player/stay.png").getImage();
 
         this.runKeyFrameList = new ArrayList<>();
@@ -32,10 +32,6 @@ public class Player {
         this.width = 50;
         this.height = 100;
         this.velocity = 5;
-
-        this.score = 0;
-        this.upCounter = 0;
-        this.downCounter = 0;
     }
 
     private Image flipImageHorizontally(Image img) {
@@ -121,13 +117,5 @@ public class Player {
 
     public void setVelocity(int velocity) {
         this.velocity = velocity;
-    }
-
-    public int getScore() {
-        return score;
-    }
-
-    public void setScore(int score) {
-        this.score = score;
     }
 }

@@ -1,5 +1,8 @@
 package View;
 
+import Model.PlayerScore;
+import ViewModel.StartMenuViewModel;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -8,13 +11,14 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class StartMenu extends JPanel {
+public class StartMenu extends JPanel implements GameOverListener {
     private Image background;
     private JPanel menuPanel;
     private JTable scoreTable;
     private DefaultTableModel tableModel;
     private JFrame frame;
     private int frameWidth, frameHeight;
+    private StartMenuViewModel startMenuViewModel;
 
     public StartMenu(JFrame frame, int frameWidth, int frameHeight) {
         this.frame = frame;
@@ -23,6 +27,8 @@ public class StartMenu extends JPanel {
 
         // Load the background image
         this.background = new ImageIcon("src/assets/background.jpg").getImage();
+
+        startMenuViewModel = new StartMenuViewModel();
 
         // Set layout for StartMenu panel
         setLayout(new GridBagLayout());
@@ -34,7 +40,7 @@ public class StartMenu extends JPanel {
 
         // Create a header panel with label
         JPanel headerPanel = new JPanel();
-        JLabel headerLabel = new JLabel("Menu Header");
+        JLabel headerLabel = new JLabel("UP DOWN");
         headerPanel.setOpaque(false);
         headerLabel.setForeground(Color.WHITE); // Set header label color to white
         headerLabel.setFont(new Font("Arial", Font.BOLD, 24)); // Set header label font size
@@ -94,12 +100,17 @@ public class StartMenu extends JPanel {
 
         // Create a table model with sample data
         String[] columnNames = {"Username", "Score", "Up", "Down"};
-        Object[][] data = {
-                {"Player 1", 100, 0, 0},
-                {"Player 2", 150, 0, 0},
-                {"Player 3", 80, 0, 0}
-        };
-        tableModel = new DefaultTableModel(data, columnNames);
+
+        tableModel = new DefaultTableModel(columnNames, 0);
+        for (PlayerScore playerScore : startMenuViewModel.gettScore().getPlayerList()) {
+            Object[] rowData = {
+                    playerScore.getUsername(),
+                    playerScore.getScore(),
+                    playerScore.getUpCounter(),
+                    playerScore.getDownCounter()
+            };
+            tableModel.addRow(rowData);
+        }
 
         // Create the table
         scoreTable = new JTable(tableModel);
@@ -139,7 +150,7 @@ public class StartMenu extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Switch to GameBase panel
-                switchToGameBase();
+                switchToGameBase(usernameField.getText());
             }
         });
 
@@ -161,12 +172,12 @@ public class StartMenu extends JPanel {
         add(menuPanel, constraints);
     }
 
-    private void switchToGameBase() {
-        // Remove StartMenu panel
-        frame.getContentPane().removeAll();
-
+    private void switchToGameBase(String username) {
         // Add GameBase panel
-        GameBase gameBase = new GameBase("src/", frameWidth, frameHeight);
+        PlayerScore playerScore = startMenuViewModel.gettScore().getPlayer(username);
+        if (playerScore == null) playerScore = new PlayerScore(username, 0, 0, 0);
+        GameBase gameBase = new GameBase(playerScore, "src/", frameWidth, frameHeight);
+        gameBase.setGameOverListener(StartMenu.this);
         frame.add(gameBase);
 
         // Refresh the frame
@@ -175,6 +186,30 @@ public class StartMenu extends JPanel {
 
         // Request focus for gameBase to receive key events
         gameBase.requestFocusInWindow();
+    }
+
+    @Override
+    public void onGameOver() {
+        System.out.println("GAME OVER");
+        refreshScoreTable(); // Refresh the score table when game is over
+    }
+
+    private void refreshScoreTable() {
+        startMenuViewModel.updateTScore();
+
+        // Clear the existing table model
+        tableModel.setRowCount(0);
+
+        // Add updated scores to the table model
+        for (PlayerScore playerScore : startMenuViewModel.gettScore().getPlayerList()) {
+            Object[] rowData = {
+                    playerScore.getUsername(),
+                    playerScore.getScore(),
+                    playerScore.getUpCounter(),
+                    playerScore.getDownCounter()
+            };
+            tableModel.addRow(rowData);
+        }
     }
 
     @Override

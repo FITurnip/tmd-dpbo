@@ -19,7 +19,7 @@ public class Block {
         this.posY = posY;
         this.velocity = velocity;
         this.onTop = onTop;
-        score = 2000 - posY;
+        score = (2000 - posY) / 10;
     }
 
     public Image getImage() {

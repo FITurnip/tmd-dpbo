@@ -1,7 +1,10 @@
 import View.StartMenu;
 
+import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 
 public class Main {
     public static int frameWidth, frameHeight;
@@ -17,14 +20,43 @@ public class Main {
 
                 setFrameSize();
 
-                // Create and add StartMenu to the frame
+                // Create StartMenu panel and add it to the frame
                 StartMenu startMenu = new StartMenu(frame, frameWidth, frameHeight);
                 frame.add(startMenu);
+
+                // Set up the audio file path
+                String audioFilePath = "src/assets/pensil.wav";
+
+                // Use a separate thread for playing the audio to avoid blocking the Swing UI
+                Thread audioThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            File audioFile = new File(audioFilePath);
+                            AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
+
+                            Clip clip = AudioSystem.getClip();
+                            clip.open(audioStream);
+
+                            // Loop the clip indefinitely
+                            clip.loop(Clip.LOOP_CONTINUOUSLY);
+
+                            // Start playing the background music
+                            clip.start();
+                        } catch (UnsupportedAudioFileException | LineUnavailableException | IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+                // Start the audio thread
+                audioThread.start();
 
                 frame.setVisible(true);
             }
         });
     }
+
 
     public static void setFrameSize() {
         // Get the local graphics environment

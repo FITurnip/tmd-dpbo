@@ -1,6 +1,7 @@
 package ViewModel;
 import Model.Block;
 import Model.Player;
+import Model.PlayerScore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,7 @@ public class GameViewModel {
     int blockWidth, blockHeight;
     int velocity;
 
-    public GameViewModel(String currentDirectory, int panelWidth, int panelHeight) {
+    public GameViewModel(PlayerScore playerScore, String currentDirectory, int panelWidth, int panelHeight) {
         this.rootDirectory = currentDirectory;
         this.blockList = new ArrayList<>();
         this.random = new Random();
@@ -24,7 +25,11 @@ public class GameViewModel {
         this.panelHeight = panelHeight;
 
         initializeBlocks();
-        this.player = new Player(currentDirectory, blockList.getFirst().getPosX(), blockList.getFirst().getPosY() - 100);
+        this.player = new Player(
+                currentDirectory,
+                blockList.getFirst().getPosX(),
+                blockList.getFirst().getPosY() - 100,
+                playerScore);
 
         Thread threadBlock = new Thread(() -> {
             while(true) {
@@ -49,6 +54,7 @@ public class GameViewModel {
 
         for (int i = 0; i < 5; i++) {
             makeBlock(velocity);
+            System.out.println("jalan");
         }
     }
 
