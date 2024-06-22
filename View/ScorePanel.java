@@ -1,7 +1,6 @@
 package View;
 
 import Model.PlayerScore;
-import ViewModel.GameViewModel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,17 +13,19 @@ public class ScorePanel extends JPanel {
     public ScorePanel(PlayerScore playerScore) {
         // init value
         this.playerScore = playerScore;
-
         Font defaultFont = new Font("Comic Sans MS", Font.BOLD, 20);
 
+        // score
         scoreLabel = new JLabel("Score: " + playerScore.getScore());
         scoreLabel.setFont(defaultFont);
         scoreLabel.setBounds(10, 10, 150, 30);
 
+        // up
         upLabel = new JLabel("Up: " + playerScore.getUpCounter());
         upLabel.setFont(defaultFont);
         upLabel.setBounds(10, 50, 100, 20);
 
+        // down
         downLabel = new JLabel("Down: " + playerScore.getDownCounter());
         downLabel.setFont(defaultFont);
         downLabel.setBounds(10, 80, 100, 20);
@@ -40,7 +41,6 @@ public class ScorePanel extends JPanel {
     /**
      * Setter and gatter
      */
-
     public void updateScore(int point, boolean hangingBlock) {
         if(point != 0) {
             playerScore.setScore(playerScore.getScore() + point);

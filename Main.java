@@ -7,12 +7,14 @@ import java.io.File;
 import java.io.IOException;
 
 public class Main {
+    // screen properties
     public static int frameWidth, frameHeight;
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
+                // set frame
                 JFrame frame = new JFrame("Fullscreen Game");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -32,6 +34,7 @@ public class Main {
                     @Override
                     public void run() {
                         try {
+                            // set up value
                             File audioFile = new File(audioFilePath);
                             AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
 
@@ -52,6 +55,7 @@ public class Main {
                 // Start the audio thread
                 audioThread.start();
 
+                // show frame
                 frame.setVisible(true);
             }
         });

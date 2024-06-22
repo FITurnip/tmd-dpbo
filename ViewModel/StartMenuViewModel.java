@@ -1,15 +1,19 @@
 package ViewModel;
 
-import Model.PlayerScore;
 import Model.TScore;
 
 public class StartMenuViewModel {
+    // TScore Property
     private TScore tScore;
 
     public StartMenuViewModel() {
+        // init val of tscore
         updateTScore();
     }
 
+    /**
+     * Setter and getter
+     */
     public TScore gettScore() {
         return tScore;
     }

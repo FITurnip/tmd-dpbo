@@ -3,6 +3,7 @@ package Database;
 import java.sql.*;
 
 public class Database {
+    // mysql properties
     private Connection connection;
     private Statement statement;
 
