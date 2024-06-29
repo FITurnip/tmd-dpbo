@@ -1,3 +1,9 @@
+/**
+ * Saya Franklin Impianro Turnip mengerjakan evaluasi Tugas Masa Depan dalam mata kuliah
+ * Desain dan Pemrograman Berorientasi Objek untuk keberkahanNya maka saya
+ * tidak melakukan kecurangan seperti yang telah dispesifikasikan. Aamiin.
+ */
+
 import View.StartMenu;
 
 import javax.sound.sampled.*;
